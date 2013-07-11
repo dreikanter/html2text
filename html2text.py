@@ -35,6 +35,12 @@ import optparse, re, sys, codecs, types
 try: from textwrap import wrap
 except: pass
 
+import sys
+
+PY2 = sys.version_info[0] == 2
+
+strtype = unicode if PY2 else str
+
 # Use Unicode characters instead of their ascii psuedo-replacements
 UNICODE_SNOB = 0
 
@@ -267,8 +273,8 @@ class HTML2Text(HTMLParser.HTMLParser):
         if self.unicode_snob:
             nbsp = unichr(name2cp('nbsp'))
         else:
-            nbsp = u' '
-        self.outtext = self.outtext.replace(u'&nbsp_place_holder;', nbsp)
+            nbsp = strtype(' ')
+        self.outtext = self.outtext.replace(strtype('&nbsp_place_holder;'), nbsp)
 
         return self.outtext
 
@@ -890,7 +896,9 @@ def main():
     else:
         data = sys.stdin.read()
 
-    data = data.decode(encoding)
+    if PY2:
+        data = data.decode(encoding)
+
     h = HTML2Text(baseurl=baseurl)
     # handle options
     if options.ul_style_dash: h.ul_item_mark = '-'
